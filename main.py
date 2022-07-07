@@ -10,6 +10,10 @@ service = Service(executable_path=local_bin_chromedriver)
 driver = webdriver.Chrome(service=service)
 
 search_result_dict = {}
+test_dict = {
+    "7497030014":"https://orangecounty.craigslist.org/cto/d/irvine-2005-lexus-gx470/7497030014.html",
+    "7504701007":"https://orangecounty.craigslist.org/cto/d/huntington-beach-2006-lexus-gx470/7504701007.html"
+}
 
 
 def get_craigslist(cl_site):
@@ -48,9 +52,32 @@ def extract_data_from_URLs():
     # 2b Add date by days posted - todays date (import date and time)
     #    and add the date in the DB, add area of CL into DB table
     # 2c Add the above info with URL and data pid into the database
-    pass
+    title = ""
+    price = ""
+    location = ""
+    condition = ""
+    cylinders = ""
+    fuel = ""
+    odometer = ""
+    vin = ""
+    title_status = ""
+    paint_color = ""
+    engine_type = ""
+    for listing in test_dict:
+        listing_url = test_dict[listing]
+        driver.get(listing_url)
+        title = driver.find_element(By.ID, 'titletextonly').text
+        price = driver.find_element(By.CLASS_NAME, 'price').text
+        location = driver.find_element(By.CSS_SELECTOR, 'small').text
+        info_box = driver.find_element(By.XPATH, cl_vars.info_box_xpath)
+        info_span_list = info_box.find_elements(By.CSS_SELECTOR, 'span')
+        for info_span in info_span_list:
+            print(info_span.text)
+        print(title, price, location)
 
-get_craigslist(url.cl_inland_empire_auto_search)
+
+# get_craigslist(url.cl_inland_empire_auto_search)
 # get_craigslist(url.cl_OC_auto_search)
 # print(len(search_result_dict))
-driver.quit()
+# driver.quit()
+extract_data_from_URLs()
