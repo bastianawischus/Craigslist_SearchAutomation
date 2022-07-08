@@ -18,3 +18,5 @@ Resources
    - https://towardsdatascience.com/how-to-use-selenium-to-web-scrape-with-example-80f9b23a843a
  - How to set up Amazon Lambda
    - https://aws.amazon.com/blogs/devops/serverless-ui-testing-using-selenium-aws-lambda-aws-fargate-and-aws-developer-tools/
+ - Using Pandas dataframes
+   - https://www.bmc.com/blogs/pandas-create-dataframe-dictionary/
