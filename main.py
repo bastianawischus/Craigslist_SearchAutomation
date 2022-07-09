@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 import pandas as pd
 import cl_vars
 import url
@@ -60,17 +61,21 @@ def extract_data_from_URLs(listing_dict):
     for listing in listing_dict:
         listing_url = listing_dict[listing]
         driver.get(listing_url)
-        title = driver.find_element(By.ID, 'titletextonly').text
+        # Code below: In case page is not found will skipp the iteration
+        try:
+            title = driver.find_element(By.ID, 'titletextonly').text
+        except NoSuchElementException:
+            continue
+        # Added as sometime location is not specified
+        try:
+            location = driver.find_element(By.CSS_SELECTOR, 'small').text
+        except NoSuchElementException:
+            location = 'N/A'
         price = driver.find_element(By.CLASS_NAME, 'price').text
-        # Line below currently breaks itteration
         data_dict["pid"] = [listing]
         data_dict["listing_url"] = [listing_url]
         data_dict["title"] = [title]
         data_dict["price"] = [price]
-        try:
-            location = driver.find_element(By.CSS_SELECTOR, 'small').text
-        except:
-            location = 'N/A'
 
         info_box = driver.find_element(By.XPATH, cl_vars.info_box_xpath)
         info_span_list = info_box.find_elements(By.CSS_SELECTOR, 'span')
@@ -78,13 +83,13 @@ def extract_data_from_URLs(listing_dict):
             span_text = info_span.text
             span_key_value_list = span_text.split(': ')
             key = span_key_value_list[0]
-            value = span_key_value_list[1]
+            if len(span_key_value_list) == 2:
+                value = span_key_value_list[1]
             data_dict[key] = [value]
-        # add_to_dataframe(data_dict)
-        # print(data_dict)
-        df = pd.DataFrame.from_dict(data_dict)
-        df.to_csv(f"{cl_vars.car_to_find}_searchResults.csv")
-        print(df)
+    # Define df earlier, refactor using df only instead of dictionary
+    df = pd.DataFrame.from_dict(data_dict)
+    df.to_csv(f"{cl_vars.car_to_find}_searchResults.csv")
+    print(df)
 
 
 get_craigslist(url.cl_inland_empire_auto_search)
